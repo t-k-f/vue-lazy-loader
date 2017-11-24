@@ -1,0 +1,25 @@
+{
+  "name": "vue-lazy-loader",
+  "version": "1.0.0",
+  "description": "A lazy loading directive for vue.js",
+  "main": "vueLazyLoader.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/t-k-f/vue-lazy-loader.git"
+  },
+  "keywords": [
+    "vue",
+    "lazy",
+    "loading",
+    "image"
+  ],
+  "author": "Jan Thoma",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/t-k-f/vue-lazy-loader/issues"
+  },
+  "homepage": "https://github.com/t-k-f/vue-lazy-loader#readme"
+}
