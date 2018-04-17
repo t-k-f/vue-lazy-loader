@@ -45,7 +45,7 @@ export default
     },
     update (el, binding, vnode)
     {
-        if (isCurrent(el, binding, vnode))
+        if (!isCurrent(el, binding, vnode))
         {
             el.classList.remove('loaded')
             fetch(el, binding, vnode)
