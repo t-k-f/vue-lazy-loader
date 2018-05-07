@@ -1,39 +1,81 @@
-const fetch = (el, binding, vnode) =>
+import Vue from 'vue'
+
+/* Fetch images */
+
+const fetch = (el, src, vnode) =>
 {
-    const image = new Image()
-    image.onload = () =>
+    el.image.onload = () =>
     {
+        el.classList.add('loaded')
         if (vnode.tag === 'img')
         {
-            el.src = binding.value
+            el.src = src
+            return
         }
-        else if (vnode.tag === 'video')
+
+        if (vnode.tag === 'video')
         {
-            el.setAttribute('poster', binding.value)
+            el.setAttribute('poster', src)
+            return
         }
-        else
-        {
-            el.style.backgroundImage = 'url(' + binding.value + ')'
-        }
-        el.classList.add('loaded')
+
+        el.style.backgroundImage = 'url(' + src + ')'
     }
-    image.src = binding.value
+
+    el.image.src = src
 }
 
-const isCurrent = (el, binding, vnode) =>
+/* Check if image is current */
+
+const isCurrent = (el, src, vnode) =>
 {
+    const bindingValue = normalizeUrl(src)
+
     if (vnode.tag === 'img')
     {
-        return (el.src === binding.value)
+        return (normalizeUrl(el.src) === bindingValue)
     }
-    else if (vnode.tag === 'video')
+
+    if (vnode.tag === 'video')
     {
-        return (el.getAttribute('poster') === binding.value)
+        return (normalizeUrl(el.getAttribute('poster')) === bindingValue)
     }
-    else
+
+    return (normalizeUrl(el.style.backgroundImage.slice(5, -2)) === bindingValue)
+}
+
+/* normalize urls */
+
+const normalizeUrl = (url) =>
+{
+    return url.replace(/(^\w+:|^)\/\//, '')
+}
+
+/* check if should be revealed */
+
+const isReveal = (el, binding) =>
+{
+    if (typeof binding.value.reveal === 'undefined')
     {
-        return (el.style.backgroundImage.slice(5, -2) === binding.value)
+        return
     }
+
+    if (typeof binding.value.scroll !== 'number' && binding.value.reveal === true)
+    {
+        return true
+    }
+
+    if (el.getBoundingClientRect().y < binding.value.vh)
+    {
+        return true
+    }
+}
+
+/* check if binding is obj */
+
+const isObj = (binding) =>
+{
+    return (typeof binding.value === 'string') ? binding.value : binding.value.src
 }
 
 export default
@@ -41,14 +83,33 @@ export default
     bind (el, binding, vnode)
     {
         el.classList.add('lazy')
-        fetch(el, binding, vnode)
+        el.image = new Image()
+    },
+    inserted (el, binding, vnode)
+    {
+        if (typeof binding.value !== 'string' || !isReveal(el, binding))
+        {
+            return
+        }
+
+        fetch(el, isObj(binding), vnode)
     },
     update (el, binding, vnode)
     {
-        if (!isCurrent(el, binding, vnode))
+        if (typeof binding.value !== 'string' || !isReveal(el, binding))
+        {
+            return
+        }
+
+        if (!isCurrent(el, isObj(binding), vnode))
         {
             el.classList.remove('loaded')
-            fetch(el, binding, vnode)
+            fetch(el, isObj(binding), vnode)
         }
+    },
+    unbind (el)
+    {
+        el.image.src = ''
+        el.image = null
     }
 }
