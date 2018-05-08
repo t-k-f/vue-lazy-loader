@@ -28,8 +28,8 @@ Vue.directive('lazy', VueLazyLoader)
 
 ### Scroll Reveal
 
-If you want to load the pictures only when they are in viewport, pass the scroll position and the viewport height to the directive. If you want to wait to reveal the image on a certain event set reveal to false
+If you want to load the pictures only when they are in viewport, pass the scroll position and the viewport height to the directive. If you want to wait to reveal the image on a certain event set reveal to false. Offset defines the offset from the bottom of page as factor.
 
 ```
-<img v-lazy='{src: '/assets/img.jpg', scroll: SCROLL_POSITION, vh: VIEWPORT_HEIGHT, reveal: true}'>
+<img v-lazy='{src: '/assets/img.jpg', scroll: SCROLL_POSITION, vh: VIEWPORT_HEIGHT, reveal: true, offset: 0.1}'>
 ```
