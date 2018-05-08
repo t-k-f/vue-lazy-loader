@@ -51,22 +51,40 @@ const normalizeUrl = (url) =>
     return url.replace(/(^\w+:|^)\/\//, '')
 }
 
-/* check if should be revealed */
+/* check if image should be revealed */
 
 const isReveal = (el, binding) =>
 {
-    if (typeof binding.value.reveal === 'undefined')
-    {
-        return
-    }
+    const value = binding.value
 
-    if (typeof binding.value.scroll !== 'number' && binding.value.reveal === true)
+    if (typeof value === 'string')
     {
         return true
     }
 
-    if (el.getBoundingClientRect().y < binding.value.vh)
+    if (typeof value.src === 'undefined')
     {
+        throw 'src key is missing';
+    }
+
+    if (typeof value.reveal === 'undefined' || value.reveal)
+    {
+        if (typeof value.scroll === 'number' && typeof value.vh === 'undefined')
+        {
+            throw 'vh key is missing';
+        }
+
+        if (typeof value.scroll === 'undefined' && typeof value.vh === 'number')
+        {
+            throw 'scroll key is missing';
+        }
+
+        if (typeof value.scroll === 'number' && typeof value.vh === 'number')
+        {
+            const offset = (typeof value.offset === 'number') ? 1 - value.offset : 1
+            return el.getBoundingClientRect().y < value.vh * offset
+        }
+
         return true
     }
 }
@@ -87,7 +105,7 @@ export default
     },
     inserted (el, binding, vnode)
     {
-        if (typeof binding.value !== 'string' || !isReveal(el, binding))
+        if (!isReveal(el, binding))
         {
             return
         }
@@ -96,7 +114,7 @@ export default
     },
     update (el, binding, vnode)
     {
-        if (typeof binding.value !== 'string' || !isReveal(el, binding))
+        if (!isReveal(el, binding))
         {
             return
         }
