@@ -27,8 +27,13 @@ const fetch = (el, src, vnode) =>
 
 /* Check if image is current */
 
-const isCurrent = (binding) =>
+const isCurrent = (el, binding) =>
 {
+    if(!el.src)
+    {
+        return
+    }
+
     if (typeof binding.value === 'string')
     {
         return (binding.value === binding.oldValue)
@@ -105,7 +110,7 @@ export default
             return
         }
 
-        if (!isCurrent(binding))
+        if (!isCurrent(el, binding))
         {
             el.classList.remove('loaded')
             fetch(el, getImageUrl(binding), vnode)
