@@ -7,6 +7,7 @@ const fetch = (el, src, vnode) =>
     el.image.onload = () =>
     {
         el.classList.add('loaded')
+
         if (vnode.tag === 'img')
         {
             el.src = src
@@ -18,7 +19,6 @@ const fetch = (el, src, vnode) =>
             el.setAttribute('poster', src)
             return
         }
-
         el.style.backgroundImage = 'url(' + src + ')'
     }
 
@@ -27,28 +27,14 @@ const fetch = (el, src, vnode) =>
 
 /* Check if image is current */
 
-const isCurrent = (el, src, vnode) =>
+const isCurrent = (binding) =>
 {
-    const bindingValue = normalizeUrl(src)
-
-    if (vnode.tag === 'img')
+    if (typeof binding.value === 'string')
     {
-        return (normalizeUrl(el.src) === bindingValue)
+        return (binding.value === binding.oldValue)
     }
 
-    if (vnode.tag === 'video')
-    {
-        return (normalizeUrl(el.getAttribute('poster')) === bindingValue)
-    }
-
-    return (normalizeUrl(el.style.backgroundImage.slice(5, -2)) === bindingValue)
-}
-
-/* normalize urls */
-
-const normalizeUrl = (url) =>
-{
-    return url.replace(/(^\w+:|^)\/\//, '')
+    return (binding.value.src === binding.oldValue.src)
 }
 
 /* check if image should be revealed */
@@ -89,9 +75,9 @@ const isReveal = (el, binding) =>
     }
 }
 
-/* check if binding is obj */
+/* return image url */
 
-const isObj = (binding) =>
+const getImageUrl = (binding) =>
 {
     return (typeof binding.value === 'string') ? binding.value : binding.value.src
 }
@@ -110,7 +96,7 @@ export default
             return
         }
 
-        fetch(el, isObj(binding), vnode)
+        fetch(el, getImageUrl(binding), vnode)
     },
     update (el, binding, vnode)
     {
@@ -119,10 +105,10 @@ export default
             return
         }
 
-        if (!isCurrent(el, isObj(binding), vnode))
+        if (!isCurrent(binding))
         {
             el.classList.remove('loaded')
-            fetch(el, isObj(binding), vnode)
+            fetch(el, getImageUrl(binding), vnode)
         }
     },
     unbind (el)
