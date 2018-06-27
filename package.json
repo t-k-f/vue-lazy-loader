@@ -4,7 +4,7 @@
   "description": "A lazy loading directive for vue.js",
   "main": "./dist/build.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "babel": "babel --presets env src/index.js -o dist/build.js"
   },
   "repository": {
     "type": "git",
@@ -21,5 +21,11 @@
   "bugs": {
     "url": "https://github.com/t-k-f/vue-lazy-loader/issues"
   },
-  "homepage": "https://github.com/t-k-f/vue-lazy-loader#readme"
+  "homepage": "https://github.com/t-k-f/vue-lazy-loader#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-minify": "^0.4.3"
+  }
 }
