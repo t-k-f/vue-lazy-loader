@@ -29,7 +29,7 @@ const fetch = (el, src, vnode) =>
 
 const isCurrent = (el, binding) =>
 {
-    if(!el.src)
+    if(!el.image.src)
     {
         return
     }
