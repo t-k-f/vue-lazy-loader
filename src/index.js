@@ -73,7 +73,7 @@ const isReveal = (el, binding) =>
         if (typeof value.scroll === 'number' && typeof value.vh === 'number')
         {
             const offset = (typeof value.offset === 'number') ? 1 - value.offset : 1
-            return el.getBoundingClientRect().y || el.getBoundingClientRect().top < value.vh * offset
+            return (el.getBoundingClientRect().y || el.getBoundingClientRect().top) < value.vh * offset
         }
 
         return true
