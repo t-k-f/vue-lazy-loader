@@ -4,32 +4,39 @@ import Vue from 'vue'
 
 const fetch = (el, src, vnode) =>
 {
-    el.image.onload = () =>
+    el.onload = () =>
     {
         el.classList.add('loaded')
+    }
 
-        if (vnode.tag === 'img')
-        {
-            el.src = src
-            return
-        }
-
+    el.image.onload = () =>
+    {
         if (vnode.tag === 'video')
         {
             el.setAttribute('poster', src)
+
             return
         }
+
         el.style.backgroundImage = 'url(' + src + ')'
     }
 
+    if (vnode.tag === 'img')
+    {
+        el.src = src
+
+        return
+    }
+
     el.image.src = src
+
 }
 
 /* Check if image is current */
 
 const isCurrent = (el, binding) =>
 {
-    if(!el.image.src)
+    if(!el.image.src && !el.src)
     {
         return
     }
