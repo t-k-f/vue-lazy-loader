@@ -1,6 +1,6 @@
-# Vue.js Lazy loader directive
+# Vue.js Lazy loader plugin
 
-A lazy loading directive for vue.js
+A lazy loading directive for vue.js based on [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 
 ### Installing
 
@@ -13,7 +13,7 @@ then
 ```
 import VueLazyLoader from 'vue-lazy-loader'
 
-Vue.directive('lazy', VueLazyLoader)
+Vue.use(VueLazyLoader, { root: null, rootMargin: '0px', threshold: [0.75, 1] })
 ```
 
 ### Usage
@@ -28,8 +28,18 @@ Vue.directive('lazy', VueLazyLoader)
 
 ### Scroll Reveal
 
-If you want to load the pictures only when they are in viewport, pass the scroll position and the viewport height to the directive. If you want to wait to reveal the image on a certain event set reveal to false. Offset defines the offset from the bottom of page as factor.
+Pictures are loaded on demand by when they are visible in the viewport. For possible option [see](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API).
+
+### Updating Options
 
 ```
-<img v-lazy='{src: '/assets/img.jpg', scroll: SCROLL_POSITION, vh: VIEWPORT_HEIGHT, reveal: true, offset: 0.1}'>
+Vue.$vll.observer({
+    root: null,
+    rootMargin: '0px',
+    threshold: [0, 1]
+})
 ```
+
+### Browser support
+
+If a browser doesn't support intersectionObserver the plugin will just plain lazy load the images, without waiting for the images to appear in the viewport.
