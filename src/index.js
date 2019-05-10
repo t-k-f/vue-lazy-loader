@@ -1,131 +1,126 @@
 import Vue from 'vue'
 
-/* Fetch images */
+export default {
 
-const fetch = (el, src, vnode) =>
-{
-    el.onload = () =>
+    install (Vue, options)
     {
-        el.classList.add('loaded')
-    }
-
-    el.image.onload = () =>
-    {
-        if (vnode.tag === 'video')
+        const setImage = (el) =>
         {
-            el.setAttribute('poster', src)
+            if (el.tagName === 'IMG')
+            {
+                return el
+            }
 
-            return
+            el.image = new Image()
+
+            return el.image
         }
 
-        el.style.backgroundImage = 'url(' + src + ')'
-    }
-
-    if (vnode.tag === 'img')
-    {
-        el.src = src
-
-        return
-    }
-
-    el.image.src = src
-
-}
-
-/* Check if image is current */
-
-const isCurrent = (el, binding) =>
-{
-    if(!el.image.src && !el.src)
-    {
-        return
-    }
-
-    if (typeof binding.value === 'string')
-    {
-        return (binding.value === binding.oldValue)
-    }
-
-    return (binding.value.src === binding.oldValue.src)
-}
-
-/* check if image should be revealed */
-
-const isReveal = (el, binding) =>
-{
-    const value = binding.value
-
-    if (typeof value === 'string')
-    {
-        return true
-    }
-
-    if (typeof value.src === 'undefined')
-    {
-        throw 'src key is missing';
-    }
-
-    if (typeof value.reveal === 'undefined' || value.reveal)
-    {
-        if (typeof value.scroll === 'number' && typeof value.vh === 'undefined')
+        const setLoader = (items, observer) =>
         {
-            throw 'vh key is missing';
+            for (var i = 0; i < items.length; i++)
+            {
+                if (!items[i].isIntersecting)
+                {
+                    continue
+                }
+
+                setSource(items[i].target, items[i].target.source)
+            }
         }
 
-        if (typeof value.scroll === 'undefined' && typeof value.vh === 'number')
+        const setOnload = (el) =>
         {
-            throw 'scroll key is missing';
+            if (el.tagName === 'VIDEO')
+            {
+                el.poster = el.source
+            }
+
+            else if (el.tagName !== 'IMG')
+            {
+                el.style.backgroundImage = 'url(' + el.source + ')'
+            }
+
+            el.classList.add('loaded')
+            observer.unobserve(el)
         }
 
-        if (typeof value.scroll === 'number' && typeof value.vh === 'number')
-        {
-            const offset = (typeof value.offset === 'number') ? 1 - value.offset : 1
-            return (el.getBoundingClientRect().y || el.getBoundingClientRect().top) < value.vh * offset
-        }
-
-        return true
-    }
-}
-
-/* return image url */
-
-const getImageUrl = (binding) =>
-{
-    return (typeof binding.value === 'string') ? binding.value : binding.value.src
-}
-
-export default
-{
-    bind (el, binding, vnode)
-    {
-        el.classList.add('lazy')
-        el.image = new Image()
-    },
-    inserted (el, binding, vnode)
-    {
-        if (!isReveal(el, binding))
-        {
-            return
-        }
-
-        fetch(el, getImageUrl(binding), vnode)
-    },
-    update (el, binding, vnode)
-    {
-        if (!isReveal(el, binding))
-        {
-            return
-        }
-
-        if (!isCurrent(el, binding))
+        const setUnload = (el) =>
         {
             el.classList.remove('loaded')
-            fetch(el, getImageUrl(binding), vnode)
+            observer.observe(el)
         }
-    },
-    unbind (el)
-    {
-        el.image.src = ''
-        el.image = null
+
+        const setSource = (target, source) =>
+        {
+            if (target.tagName === 'IMG')
+            {
+                target.src = source
+                return
+            }
+
+            target.image.src = source
+        }
+
+        const setObserverPolyfill = () =>
+        {
+            return {
+                observe: (el) =>
+                {
+                    setSource(el, el.source)
+                },
+                unobserve: (el) =>
+                {
+                }
+            }
+        }
+
+        const observerOptionsDefault = { root: null, rootMargin: '0px', threshold: [0, 1] }
+        const observerOptions = options || observerOptionsDefault
+        const observerFallback = (!('IntersectionObserver' in window) || !('IntersectionObserverEntry' in window) || !('intersectionRatio' in window.IntersectionObserverEntry.prototype))
+
+        var observer = (observerFallback) ? setObserverPolyfill() : new IntersectionObserver(setLoader, observerOptions)
+
+        Vue.directive('lazy', {
+            inserted (el, binding, vnode)
+            {
+                const image = setImage(el)
+
+                el.source = binding.value
+                el.classList.add('lazy')
+
+                observer.observe(el)
+                image.onload = () =>
+                {
+                    setOnload(el)
+                }
+            },
+            update (el, binding)
+            {
+                if (el.source === binding.value)
+                {
+                    return
+                }
+
+                el.source = binding.value
+
+                setUnload(el)
+            },
+            unbind (el)
+            {
+                if (el.image) el.image = null
+            }
+        })
+
+        Vue.prototype.$vll =
+        {
+            observer: (options) =>
+            {
+                const assignOptions = Object.assign({}, observerOptionsDefault)
+                Object.assign(assignOptions, options)
+
+                observer = new IntersectionObserver(setLoader, assignOptions)
+            }
+        }
     }
 }
