@@ -1,8 +1,5 @@
-import Vue from 'vue'
-
 export default {
-
-    install (Vue, options)
+    install: (app, options) =>
     {
         const setImage = (el) =>
         {
@@ -16,17 +13,13 @@ export default {
             return el.image
         }
 
-        const setLoader = (items, observer) =>
+        const setLoad = (el) =>
         {
-            for (var i = 0; i < items.length; i++)
-            {
-                if (!items[i].isIntersecting)
-                {
-                    continue
-                }
+            const source = el.dataset.lazyLoad
+            const image = setImage(el)
 
-                setSource(items[i].target, items[i].target.source)
-            }
+            image.src = source
+            image.onload = () => setOnload(el)
         }
 
         const setOnload = (el) =>
@@ -35,92 +28,53 @@ export default {
             {
                 el.poster = el.source
             }
-
             else if (el.tagName !== 'IMG')
             {
-                el.style.backgroundImage = 'url(' + el.source + ')'
+                el.style.backgroundImage = `url(${el.source})`
             }
 
             el.classList.add('loaded')
             observer.unobserve(el)
         }
 
-        const setUnload = (el) =>
+        const setObserverCallback = (items) =>
         {
-            el.classList.remove('loaded')
-            observer.observe(el)
-        }
+            const intersect = items.find(item => item.isIntersecting)
 
-        const setSource = (target, source) =>
-        {
-            if (target.tagName === 'IMG')
+            if (!intersect)
             {
-                target.src = source
                 return
             }
 
-            target.image.src = source
-        }
-
-        const setObserverPolyfill = () =>
-        {
-            return {
-                observe: (el) =>
-                {
-                    setSource(el, el.source)
-                },
-                unobserve: (el) =>
-                {
-                }
-            }
+            setLoad(intersect.target)
         }
 
         const observerOptionsDefault = { root: null, rootMargin: '0px', threshold: [0, 1] }
-        const observerOptions = options || observerOptionsDefault
-        const observerFallback = (!('IntersectionObserver' in window) || !('IntersectionObserverEntry' in window) || !('intersectionRatio' in window.IntersectionObserverEntry.prototype))
+        const observerOptions = Object.assign(observerOptionsDefault, options)
+        const observer = new IntersectionObserver(setObserverCallback, observerOptions)
 
-        var observer = (observerFallback) ? setObserverPolyfill() : new IntersectionObserver(setLoader, observerOptions)
-
-        Vue.directive('lazy', {
-            inserted (el, binding, vnode)
+        app.directive('lazy', {
+            mounted (el, binding)
             {
-                const image = setImage(el)
-
-                el.source = binding.value
+                el.dataset.lazyLoad = binding.value
                 el.classList.add('lazy')
-
                 observer.observe(el)
-                image.onload = () =>
-                {
-                    setOnload(el)
-                }
             },
-            update (el, binding)
+            updated (el, binding)
             {
-                if (el.source === binding.value)
+                if (binding.oldValue === binding.value)
                 {
                     return
                 }
 
-                el.source = binding.value
-
-                setUnload(el)
+                el.dataset.lazyLoad = binding.value
+                el.classList.remove('loaded')
+                observer.observe(el)
             },
-            unbind (el)
+            beforeUnmount (el)
             {
                 if (el.image) el.image = null
             }
         })
-
-        Vue.prototype.$vll =
-        {
-            observer: (options) =>
-            {
-                const assignOptions = Object.assign({}, observerOptionsDefault)
-                Object.assign(assignOptions, options)
-
-                observer = new IntersectionObserver(setLoader, assignOptions)
-            }
-        }
     }
 }
