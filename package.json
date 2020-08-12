@@ -1,6 +1,6 @@
 {
   "name": "vue-lazy-loader",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A lazy loading directive for vue.js",
   "main": "./dist/build.js",
   "scripts": {
@@ -26,6 +26,6 @@
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
-    "babel-preset-minify": "^0.4.3"
+    "babel-preset-minify": "^0.5.1"
   }
 }

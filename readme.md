@@ -1,6 +1,6 @@
 # Vue.js Lazy loader plugin
 
-A lazy loading directive for vue.js based on [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
+A lazy loading directive for vue.js 3.x based on [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 
 ### Installing
 
@@ -13,7 +13,7 @@ then
 ```
 import VueLazyLoader from 'vue-lazy-loader'
 
-Vue.use(VueLazyLoader, { root: null, rootMargin: '0px', threshold: [0.75, 1] })
+createApp(App).use(VueLazyLoader, VueLazyLoader, { root: null, rootMargin: '0px', threshold: [0.75, 1] })
 ```
 
 ### Usage
@@ -30,16 +30,11 @@ Vue.use(VueLazyLoader, { root: null, rootMargin: '0px', threshold: [0.75, 1] })
 
 Pictures are loaded on demand by when they are visible in the viewport. For possible option [see](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API).
 
-### Updating Options
-
-```
-Vue.$vll.observer({
-    root: null,
-    rootMargin: '0px',
-    threshold: [0, 1]
-})
-```
-
 ### Browser support
 
-If a browser doesn't support intersectionObserver the plugin will just plain lazy load the images, without waiting for the images to appear in the viewport.
+Support for IE11 was removed in Version 3.0.0 and above.
+For supported browsers see [https://caniuse.com/#feat=intersectionobserver](https://caniuse.com/#feat=intersectionobserver)
+
+### Vue.js 2x
+
+Please install the package version @2.0.0
