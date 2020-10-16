@@ -39,14 +39,15 @@ export default {
 
         const setObserverCallback = (items) =>
         {
-            const intersect = items.find(item => item.isIntersecting)
-
-            if (!intersect)
+            items.forEach(item =>
             {
-                return
-            }
+                if(!item.isIntersecting)
+                {
+                    return
+                }
 
-            setLoad(intersect.target)
+                setLoad(item.target)
+            })
         }
 
         const observerOptionsDefault = { root: null, rootMargin: '0px', threshold: [0, 1] }
