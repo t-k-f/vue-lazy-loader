@@ -24,13 +24,15 @@ export default {
 
         const setOnload = (el) =>
         {
+            const source = el.dataset.lazyLoad
+
             if (el.tagName === 'VIDEO')
             {
-                el.poster = el.source
+                el.poster = source
             }
             else if (el.tagName !== 'IMG')
             {
-                el.style.backgroundImage = `url(${el.source})`
+                el.style.backgroundImage = `url(${source})`
             }
 
             el.classList.add('loaded')
