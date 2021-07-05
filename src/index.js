@@ -52,9 +52,20 @@ export default {
             })
         }
 
-        const observerOptionsDefault = { root: null, rootMargin: '0px', threshold: [0, 1] }
-        const observerOptions = Object.assign(observerOptionsDefault, options)
-        const observer = new IntersectionObserver(setObserverCallback, observerOptions)
+        let observerOptionsDefault
+        let observerOptions
+        let observer
+
+        try
+        {
+            observerOptionsDefault = { root: null, rootMargin: '0px', threshold: [0, 1] }
+            observerOptions = Object.assign(observerOptionsDefault, options)
+            observer = new IntersectionObserver(setObserverCallback, observerOptions)
+        }
+        catch (error)
+        {
+            observer = {}
+        }
 
         app.directive('lazy', {
             mounted (el, binding)
