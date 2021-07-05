@@ -1,6 +1,6 @@
 {
   "name": "vue-lazy-loader",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "A lazy loading directive for vue.js",
   "main": "./dist/build.js",
   "scripts": {
